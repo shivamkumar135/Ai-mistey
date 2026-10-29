@@ -10,7 +10,8 @@ import { MysteryCase } from './model.js';
 dotenv.config({ path: fileURLToPath(new URL('../.env', import.meta.url)) });
 
 const app = express();
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }));
+const clientOrigin = (process.env.CLIENT_URL || 'http://localhost:5173').trim().replace(/\/+$/, '');
+app.use(cors({ origin: clientOrigin }));
 app.use(express.json());
 const sizes = { easy: { suspects: 3, clues: 5, hints: 2 }, medium: { suspects: 4, clues: 7, hints: 3 }, hard: { suspects: 5, clues: 9, hints: 3 } };
 const model = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
