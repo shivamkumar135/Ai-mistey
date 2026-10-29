@@ -16,17 +16,41 @@ A full stack mystery game. The Express API generates and validates cases with Ge
 
 The API listens on port 5000 by default. Set `VITE_API_URL` in `client/.env` if the API is hosted elsewhere.
 
-## Deploy
+## Deploy step by step
 
-The deployment configuration targets Render for the API and Vercel for the frontend. Both platforms need this project in a Git repository connected to your hosting account.
+This project uses Render for the API and Vercel for the frontend. The GitHub repository is `shivamkumar135/Ai-Mystery`, on branch `main`.
 
-1. Push this project to a GitHub repository.
-2. In Vercel, import the repository. `vercel.json` configures the Vite build and single-page app routing. Set `VITE_API_URL` to `https://casefile-mystery-api.onrender.com/api`, then deploy to get the frontend's actual production URL.
-3. In Render, create a new Blueprint from the same repository and use `render.yaml`. Enter `GEMINI_API_KEY`, `MONGODB_URI`, and the actual Vercel production URL for `CLIENT_URL`. Keep the Gemini key and database URI on the server only.
-4. Confirm `https://<your-api-host>/api/health` returns `{ "ok": true }`, then create a mystery on the deployed site.
+### 1. Prepare your services and secrets
 
-If Render assigns a different API hostname, update `VITE_API_URL` in Vercel to that host plus `/api` and redeploy the frontend.
+- Create a MongoDB Atlas database and copy its connection URI.
+- Create a **new Gemini API key**. A previous key was detected in a rejected GitHub push, so revoke that old key before deploying.
+- Keep both values private. Do not paste them into GitHub files or chat.
 
-Allow the deployed API to connect to your MongoDB Atlas cluster. If Atlas uses an IP access list, configure it to allow connections from the deployed backend. Never commit `server/.env` or add secret values to Vercel's frontend variables.
+### 2. Deploy the API on Render
 
-`GET /api/health` is the backend health check.
+1. Sign in to Render and choose **New → Blueprint**.
+2. Connect `shivamkumar135/Ai-Mystery`, select branch `main`, and let Render read `render.yaml`.
+3. When prompted, enter `GEMINI_API_KEY` and `MONGODB_URI`. For the first `CLIENT_URL` value, enter `https://placeholder.vercel.app`; you will replace it after Vercel creates the frontend URL.
+4. Create the Blueprint and wait for the API service to finish deploying. Copy its public URL, such as `https://casefile-mystery-api.onrender.com`.
+5. Open `https://<your-render-host>/api/health`. It should return `{ "ok": true }`.
+
+If MongoDB Atlas uses an IP access list and Render cannot connect, configure Atlas to allow the deployed backend to connect.
+
+### 3. Deploy the frontend on Vercel
+
+1. In Vercel, choose **Add New → Project** and import the same GitHub repository and `main` branch.
+2. Keep the repository root as the project root. `vercel.json` supplies the Vite build command, output folder, and React Router fallback.
+3. Add the environment variable `VITE_API_URL` with your Render URL plus `/api`, for example `https://casefile-mystery-api.onrender.com/api`.
+4. Deploy, then copy the Vercel production URL, for example `https://ai-mystery-room.vercel.app`.
+
+The production build stops with an actionable error if `VITE_API_URL` is missing.
+
+### 4. Allow the frontend to call the API
+
+1. In Render, open the API service’s environment variables.
+2. Change `CLIENT_URL` from the placeholder to the exact Vercel production URL (no trailing slash), then save and redeploy.
+3. Open the Vercel site and generate a mystery to confirm the full flow.
+
+### Later updates
+
+Push changes to the connected GitHub `main` branch. Vercel and Render will deploy automatically if their GitHub auto-deploy settings are enabled. For local development, keep secrets in `server/.env`; the example file contains placeholders only.
