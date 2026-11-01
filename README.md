@@ -39,18 +39,13 @@ If MongoDB Atlas uses an IP access list and Render cannot connect, configure Atl
 ### 3. Deploy the frontend on Vercel
 
 1. In Vercel, choose **Add New → Project** and import the same GitHub repository and `main` branch.
-2. Keep the repository root as the project root. `vercel.json` supplies the Vite build command, output folder, and React Router fallback.
-3. Add the environment variable `VITE_API_URL` with your Render URL plus `/api`, for example `https://casefile-mystery-api.onrender.com/api`.
-4. Deploy, then copy the Vercel production URL, for example `https://ai-mystery-room.vercel.app`.
-
-The production build stops with an actionable error if `VITE_API_URL` is missing.
+2. Keep the repository root as the project root. `vercel.json` supplies the Vite build command, output folder, React Router fallback, and proxy to `https://ai-mistey.onrender.com`.
+3. Deploy, then copy the Vercel production URL, for example `https://ai-mystery-room.vercel.app`.
 
 ### 4. Allow the frontend to call the API
 
-1. In Render, open the API service’s environment variables.
-2. Change `CLIENT_URL` from the placeholder to the exact Vercel production URL (no trailing slash), then save and redeploy.
-3. Open the Vercel site and generate a mystery to confirm the full flow.
+1. Open the Vercel site and generate a mystery to confirm the full flow. Browser API calls go through the Vercel proxy, so the browser does not call Render directly.
 
 ### Later updates
 
-Push changes to the connected GitHub `main` branch. Vercel and Render will deploy automatically if their GitHub auto-deploy settings are enabled. For local development, keep secrets in `server/.env`; the example file contains placeholders only.
+Push changes to the connected GitHub `main` branch. Vercel and Render will deploy automatically if their GitHub auto-deploy settings are enabled. If the Render hostname changes, update the API destination in the root `vercel.json`. For local development, keep secrets in `server/.env`; the example file contains placeholders only.
